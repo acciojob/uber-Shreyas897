@@ -44,40 +44,86 @@ public class CustomerServiceImpl implements CustomerService {
 	public TripBooking bookTrip(int customerId, String fromLocation, String toLocation, int distanceInKm) throws Exception{
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
-		TripBooking tripBooking=new TripBooking();
-		List<Driver>driverList=driverRepository2.findAll();
-		Driver driver=null;
-		for(Driver x:driverList){
-			if(driver==null){
-				driver=x;
-			}
-			else if(x.getDriverId()<driver.getDriverId() && x.getCab().getAvailable()){
-				driver=x;
+//		TripBooking tripBooking=new TripBooking();
+//		List<Driver>driverList=driverRepository2.findAll();
+//		Driver driver=null;
+//		for(Driver x:driverList){
+//			if(driver==null){
+//				driver=x;
+//			}
+//			else if(x.getDriverId()<driver.getDriverId() && x.getCab().getAvailable()){
+//				driver=x;
+//			}
+//		}
+//		if(driver==null)
+//			throw new Exception("No cab available!");
+//		driver.getCab().setAvailable(false);
+//		tripBooking.setDistanceInKm(distanceInKm);
+//		tripBooking.setFromLocation(fromLocation);
+//		tripBooking.setToLocation(toLocation);
+//		tripBooking.setBill(0);
+//		tripBooking.setStatus(TripStatus.CONFIRMED);
+//		Customer customer=customerRepository2.findById(customerId).get();
+//		tripBooking.setCustomer(customer);
+//		tripBooking.setDriver(driver);
+//
+//		List<TripBooking>tripBookingListForCustomer=customer.getTripBookingList();
+//		tripBookingListForCustomer.add(tripBooking);
+//		customer.setTripBookingList(tripBookingListForCustomer);
+//		customerRepository2.save(customer);
+//
+//
+//		List<TripBooking>tripBookingListForDriver=driver.getTripBookingList();
+//		tripBookingListForDriver.add(tripBooking);
+//		driver.setTripBookingList(tripBookingListForDriver);
+//
+//		driverRepository2.save(driver);
+//
+//		return tripBooking;
+		TripBooking tripBooking = new TripBooking();
+		Driver driver = null;
+
+		// Filtering the driver who is free and with lowest ID
+		List<Driver> allDrivers = driverRepository2.findAll();
+
+		for(Driver driver1 : allDrivers){
+
+			//checking if driver are available or not
+			if(driver1.getCab().getAvailable()==Boolean.TRUE){
+				if((driver ==null) || (driver1.getDriverId() < driver.getDriverId())){
+					driver = driver1;
+				}
 			}
 		}
-		if(driver==null)
+		// if no drivers are Available throws an execption
+		if(driver==null){
 			throw new Exception("No cab available!");
-		driver.getCab().setAvailable(false);
-		tripBooking.setDistanceInKm(distanceInKm);
-		tripBooking.setFromLocation(fromLocation);
-		tripBooking.setToLocation(toLocation);
-		tripBooking.setBill(0);
-		tripBooking.setStatus(TripStatus.CONFIRMED);
-		Customer customer=customerRepository2.findById(customerId).get();
+		}
+
+		// Before Saving Setting up all the attributes of Entity Layers
+		Customer customer = customerRepository2.findById(customerId).get();
 		tripBooking.setCustomer(customer);
 		tripBooking.setDriver(driver);
+		tripBooking.setFromLocation(fromLocation);
+		tripBooking.setToLocation(toLocation);
+		tripBooking.setDistanceInKm(distanceInKm);
 
-		List<TripBooking>tripBookingListForCustomer=customer.getTripBookingList();
-		tripBookingListForCustomer.add(tripBooking);
-		customer.setTripBookingList(tripBookingListForCustomer);
+		int ratePerKm = driver.getCab().getPerKmRate();
+		tripBooking.setBill(distanceInKm*10);
+		tripBooking.setStatus(TripStatus.CONFIRMED);
+
+		// as the cab is booked now Driver is not Available therefore setting the status to FALSE
+		driver.getCab().setAvailable(false);
+
+		//Setting Bi direction mapping attributes
+		customer.getTripBookingList().add(tripBooking);
 		customerRepository2.save(customer);
 
-
-		List<TripBooking>tripBookingListForDriver=driver.getTripBookingList();
-		tripBookingListForDriver.add(tripBooking);
-		driver.setTripBookingList(tripBookingListForDriver);
-
+		driver.getTripBookingList().add(tripBooking);
 		driverRepository2.save(driver);
+
+		// we dont need to do tripBookingRepository2.save(tripBooking) because it is the child of both
+		// Customer and Driver and due to cascading effect it get automatically saved
 
 		return tripBooking;
 

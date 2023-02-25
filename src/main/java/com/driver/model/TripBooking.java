@@ -2,7 +2,7 @@ package com.driver.model;
 
 import jakarta.persistence.*;
 @Entity
-@Table(name="tripbooking")
+@Table(name="tripBooking")
 public class TripBooking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
