@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int adminID;
+    private int adminId;
     private String username;
     private String password;
 
@@ -15,11 +15,11 @@ public class Admin {
     }
 
     public int getAdminId() {
-        return adminID;
+        return adminId;
     }
 
     public void setAdminID(int adminID) {
-        this.adminID = adminID;
+        this.adminId = adminID;
     }
 
     public String getUsername() {
