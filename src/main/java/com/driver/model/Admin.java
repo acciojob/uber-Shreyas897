@@ -14,7 +14,7 @@ public class Admin {
     public Admin() {
     }
 
-    public int getAdminID() {
+    public int getAdminId() {
         return adminID;
     }
 
