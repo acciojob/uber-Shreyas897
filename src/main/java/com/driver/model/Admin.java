@@ -18,8 +18,8 @@ public class Admin {
         return adminId;
     }
 
-    public void setAdminID(int adminID) {
-        this.adminId = adminID;
+    public void setAdminId(int adminId) {
+        this.adminId = adminId;
     }
 
     public String getUsername() {
